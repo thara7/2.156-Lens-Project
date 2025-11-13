@@ -14,14 +14,14 @@ def read_text_auto(filepath):
 
 # ---------------- Paths ----------------
 root_dir = r"C:\Users\User\OneDrive - Massachusetts Institute of Technology\Documents\MIT\Grad School\Classes\2.156\Lens Project\Prime Lenses\AnalysisExports"
-output_dir = r"C:\Users\User\OneDrive - Massachusetts Institute of Technology\Documents\MIT\Grad School\Classes\2.156\Lens Project\Prime Lenses\CSVExports\Vignetting"
+output_dir = r"C:\Users\User\OneDrive - Massachusetts Institute of Technology\Documents\MIT\Grad School\Classes\2.156\Lens Project\Prime Lenses\CSVExports\Longitudinal"
 os.makedirs(output_dir, exist_ok=True)
 
 # ---------------- File Matching ----------------
-file_pattern = "_Vignetting"  # Only process files ending with _Vignetting
+file_pattern = "_Longitudinal"  # Only process files ending with _Longitudinal
 
 # ---------------- Regex Patterns ----------------
-header_pattern = re.compile(r'^\s*Y\s*Field', re.IGNORECASE)
+header_pattern = re.compile(r'^\s*Rel\.?\s*Pupil', re.IGNORECASE)  # Header line
 numeric_line = re.compile(r'^[+-]?\d')  # Lines starting with a number
 
 # ---------------- Main Processing Loop ----------------
@@ -53,10 +53,14 @@ for subdir, _, files in os.walk(root_dir):
             data = []
 
             # --- Extract data lines ---
+            number_pattern = re.compile(r'[+-]?\d*\.?\d+(?:[Ee][+-]?\d+)?')
+
             for line in lines[header_idx + 1:]:
                 if not line.strip():
                     continue
-                parts = [p for p in re.split(r'\t+|\s{2,}', line.strip()) if p.strip()]
+
+                # Extract numbers (handles exponents correctly)
+                parts = number_pattern.findall(line)
 
                 if not parts or not numeric_line.match(parts[0]):
                     if data:
