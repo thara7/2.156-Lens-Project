@@ -21,7 +21,10 @@ os.makedirs(output_dir, exist_ok=True)
 file_pattern = "_FieldCurvature"  # File suffix to match
 
 # ---------------- Regex Patterns ----------------
-table_start_pattern = re.compile(r"^Table series:\s*Data for wavelength\s*:\s*(.+)$", re.IGNORECASE)
+table_start_pattern = re.compile(
+    r"^(?:Table series:\s*)?Data for wavelength\s*:\s*(.+)$",
+    re.IGNORECASE
+)
 header_pattern = re.compile(r'^\s*Y\s*(Angle|Height)', re.IGNORECASE)
 numeric_line = re.compile(r'^[+-]?\d')  # Lines starting with a number
 
@@ -30,7 +33,7 @@ for subdir, _, files in os.walk(root_dir):
     for filename in files:
         if file_pattern.lower() in filename.lower() and filename.lower().endswith('.txt'):
             filepath = os.path.join(subdir, filename)
-            # print(f"\nProcessing: {filepath}")
+            print(f"\nProcessing: {filepath}")
 
             try:
                 lines = [line.rstrip("\n") for line in read_text_auto(filepath)]
@@ -90,7 +93,7 @@ for subdir, _, files in os.walk(root_dir):
                     writer = csv.writer(csvfile)
                     writer.writerow(headers)
                     writer.writerows(all_data)
-                # print(f"✅ Saved: {output_filename} ({len(all_data)} rows)")
+                print(f"✅ Saved: {output_filename} ({len(all_data)} rows)")
             else:
                 print(f"⚠️ No data found in {filename}")
 
